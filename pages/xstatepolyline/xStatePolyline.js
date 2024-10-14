@@ -16,7 +16,7 @@ let polyline // La polyline en cours de construction;
 
 const polylineMachine = createMachine(
     {
-        /** @xstate-layout N4IgpgJg5mDOIC5QAcD2AbAngGQJYDswA6XCdMAYgFkB5AVQGUBRAYWwEkWBpAbQAYAuohSpYuAC65U+YSAAeiAGx8ArEQAcAdhV8ALAE4AzAEZD6w4v0AaEJkTHjiopv2vNWrYu199AX182aFh4hEQQAE4AhgDuBFDU9MxsnLyCsmhiktKyCgg6ukQATHwlioa6KsaF6oWFNnYIALSFhkTKJS2WKvrq+rru-oEYOATEETFxCYxMtABqTPxCSCAZElIyy7kGag7qvSqGhoW6Zuoq9fY9bQY9KicHKmWagyvDIWNRsfjxAEKRAMYAa1gyABYEW6VEa2ym0QnSIfCq+X0xj2FV0dVsiEaxjUvVcRmM7gqfD2KheQRGoXGX3iTHw4jA4Qhy1WWQ2oFy5WMRCOOmq6hOxkRjwuCAsmg0BMsmgcfBMFgpb1GYU+kyYsH+kWQ4LSrKh7JycIqzkK-NMRxarnUYrN+iIdwJBm26i8hn8ARA+FQEDgkOCo0hmXWRoQqPUCKRehRaLumIaOOFRH0JT4tXKmhOul0SoDoVI5CD0I58iUOg0Zvlikq6mM-RtWIQ1R5+kzrm6ukUykM5M9lPeqom3yLhthCCFvMUZt0jkMfGrKi0YqMyZumkKmkUDjuAw9QA */
+        /** @xstate-layout N4IgpgJg5mDOIC5QAcD2AbAngGQJYDswA6XCdMAYgFkB5AVQGUBRAYWwEkWBpAbQAYAuohSpYuAC65U+YSAAeiAMwB2AExEAbMoAsATj3bFq1QA5tyxQBoQmRAEYNuzXxeLdyjao3nlAVgC+-tZoWHiERBAATgCGAO4EUNT0zGycvIKyaGKS0rIKCNqq1rYIqmpELi52qg7KDtWBwRg4BMRRcQlJjEy0AGpM-EJIIFkSUjLD+WZEdnYmyn6KGoq+y3a+xfYemnq6ukZ2fIXzGo0jzWFtMfH4iQBC0QDGANawyE9gg5miY7mTiNsNNVfC4NCCtHxZpsECY7ERFJU+MZdKYakYziEWuF2jdEkx8OIwJEvsNRjkJqB8qp9jNVCC+B5liZllYbEoNHx4ZUar53MyvBiLq0ItdOkxYI9oshPhlST9yXlENTFLT6YzFMzFKySl5tERdPSERoTEjfL47MpAkEQPhUBA4N9Qq1vtlxoqEABaDTQr0VRH+xGW62Yy4kMhgF2-CnyRC+FYVVR6LSwwy+Ips0q6TkqEGqBFmlRBppO7Gi26RhX-BCHdS6TzmbRVJbrEzQlTqFZVROKWapoOBIA */
         id: "polyLine",
         initial: "idle",
         states: {
@@ -94,6 +94,7 @@ const polylineMachine = createMachine(
                 // Le dernier point(provisoire) ne fait pas partie de la polyline
                 const newPoints = currentPoints.slice(0, size - 2);
                 polyline.points(newPoints);
+                polyline.stroke("blue");
                 layer.batchDraw();
             },
             // Ajouter un point à la polyline
@@ -115,13 +116,11 @@ const polylineMachine = createMachine(
                 const currentPoints = polyline.points(); // Get the current points of the line
                 const size = currentPoints.length;
                 if (size > 4) {
-
                     const provisoire = currentPoints.slice(size - 2, size); // Le point provisoire
                     const oldPoints = currentPoints.slice(0, size - 4); // On enlève le dernier point enregistré
                     polyline.points(oldPoints.concat(provisoire)); // Set the updated points to the line
                     layer.batchDraw(); // Redraw the layer to reflect the changes
                 }
-
             },
         },
         guards: {

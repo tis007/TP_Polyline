@@ -16,11 +16,51 @@ let polyline // La polyline en cours de construction;
 
 const polylineMachine = createMachine(
     {
-        /** @xstate-layout N4IgpgJg5mDOIC5gF8A0IB2B7CdGgAcsAbATwBkBLDMfEI2SgF0qwzoA9EBaANnVI9eAOgAM4iZMkB2ZGnokK1MMMoRitJAsYs2nRABYATAMQAOAIzCD0gJwXetgwGZezgw9ty5QA */
+        /** @xstate-layout N4IgpgJg5mDOIC5QAcD2AbAngGQJYDswA6XCdMAYgFkB5AVQGUBRAYWwEkWBpAbQAYAuohSpYuAC65U+YSAAeiAGx8ArEQAcAdhV8ALAE4AzAEZD6w4v0AaEJkTHjiopv2vNWrYu199AX182aFh4hEQQAE4AhgDuBFDU9MxsnLyCsmhiktKyCgg6ukQATHwlioa6KsaF6oWFNnYIALSFhkTKJS2WKvrq+rru-oEYOATEETFxCYxMtABqTPxCSCAZElIyy7kGag7qvSqGhoW6Zuoq9fY9bQY9KicHKmWagyvDIWNRsfjxAEKRAMYAa1gyABYEW6VEa2ym0QnSIfCq+X0xj2FV0dVsiEaxjUvVcRmM7gqfD2KheQRGoXGX3iTHw4jA4Qhy1WWQ2oFy5WMRCOOmq6hOxkRjwuCAsmg0BMsmgcfBMFgpb1GYU+kyYsH+kWQ4LSrKh7JycIqzkK-NMRxarnUYrN+iIdwJBm26i8hn8ARA+FQEDgkOCo0hmXWRoQqPUCKRehRaLumIaOOFRH0JT4tXKmhOul0SoDoVI5CD0I58iUOg0Zvlikq6mM-RtWIQ1R5+kzrm6ukUykM5M9lPeqom3yLhthCCFDsUZpah36hUsijF+icbdcVU0TxMhQ9viAA */
         id: "polyLine",
         initial: "idle",
         states : {
             idle: {
+                on: {
+                    MOUSECLICK: {
+                        target: "drawing",
+                        actions: "createLine"
+                    }
+                }
+            },
+
+            drawing: {
+                on: {
+                    MOUSECLICK: {
+                        target: "drawing",
+                        actions: "addPoint",
+                        internal: true,
+                        cond: "pasPlein"
+                    },
+
+                    MOUSEMOVE: {
+                        target: "drawing",
+                        internal: true,
+                        actions: "setLastPoint"
+                    },
+
+                    Backspace: {
+                        target: "drawing",
+                        internal: true,
+                        actions: "removeLastPoint"
+                    },
+
+                    Enter: {
+                        target: "idle",
+                        actions: "saveLine",
+                        cond: "plusDeDeuxPoints"
+                    },
+
+                    Escape: {
+                        target: "idle",
+                        actions: "abandon"
+                    }
+                }
             }
         }
     },
@@ -66,7 +106,8 @@ const polylineMachine = createMachine(
             },
             // Abandonner le tracé de la polyline
             abandon: (context, event) => {
-                // Supprimer la variable polyline :
+                polyline.remove();
+                layer.batchDraw();
                 
             },
             // Supprimer le dernier point de la polyline
@@ -84,12 +125,12 @@ const polylineMachine = createMachine(
             pasPlein: (context, event) => {
                 // Retourner vrai si la polyline a moins de 10 points
                 // attention : dans le tableau de points, chaque point est représenté par 2 valeurs (coordonnées x et y)
-                
+                return polyline.points().length < MAX_POINTS * 2;
             },
             // On peut enlever un point
             plusDeDeuxPoints: (context, event) => {
                 // Deux coordonnées pour chaque point, plus le point provisoire
-                return polyline.points().length > 6;
+                return polyline.points().length > 4;
             },
         },
     }
